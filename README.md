@@ -6,6 +6,8 @@ This project runs and displays a simple register screen. The TestRegister button
 
 Running testClientRegister, successfully registers a user, however, fails to pass line 79 of opaque.js, as the result returns true, however sometimes it returns false, possibly due to a logic error in the protocol, or clientAuthenticate is run preemptively before waiting for an asynchronous function to finish and return.
 
+![Error](error.png)
+
 ## Available Scripts
 
 In the project directory, you can run:
