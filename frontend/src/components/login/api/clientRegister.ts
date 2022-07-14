@@ -6,12 +6,11 @@ const testClientRegister = async (password: string, user_id: string) => {
 
   console.log("Attempting registration with password: " + password);
   console.log("Attempting registration with username: " + user_id);
-  OPAQUE.clientRegister(password, user_id).then(
+  await OPAQUE.clientRegister(password, user_id).then(
     console.log.bind(null, "Registered:")
   );
 
-  
-  OPAQUE.clientAuthenticate(password, user_id).then(() => {
+  await OPAQUE.clientAuthenticate(password, user_id).then(() => {
     console.log.bind(null, "Shared secret:");
   });
 
