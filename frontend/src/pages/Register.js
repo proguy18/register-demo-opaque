@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
-import { Card, Link, Container, Typography } from '@mui/material';
+import { Link, Container, Typography } from '@mui/material';
 // hooks
 import useResponsive from '../hooks/useResponsive';
 // components
@@ -9,7 +9,6 @@ import Page from '../components/Page';
 import Logo from '../components/Logo';
 // sections
 import { RegisterForm } from '../sections/auth/register';
-
 
 // ----------------------------------------------------------------------
 
@@ -35,14 +34,14 @@ const HeaderStyle = styled('header')(({ theme }) => ({
   },
 }));
 
-const SectionStyle = styled(Card)(({ theme }) => ({
-  width: '100%',
-  maxWidth: 464,
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  margin: theme.spacing(2, 0, 2, 2),
-}));
+// const SectionStyle = styled(Card)(({ theme }) => ({
+//   width: '100%',
+//   maxWidth: 464,
+//   display: 'flex',
+//   flexDirection: 'column',
+//   justifyContent: 'center',
+//   margin: theme.spacing(2, 0, 2, 2),
+// }));
 
 const ContentStyle = styled('div')(({ theme }) => ({
   maxWidth: 480,
@@ -85,7 +84,7 @@ export default function Register() {
             <RegisterForm />
 
             <Typography variant="body2" align="center" sx={{ color: 'text.secondary', mt: 3 }}>
-              By registering, I agree to Minimal&nbsp;
+              By registering, I agree to MOSE&nbsp;
               <Link underline="always" color="text.primary" href="#">
                 Terms of Service
               </Link>{' '}
