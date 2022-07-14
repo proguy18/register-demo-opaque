@@ -1,22 +1,11 @@
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 // @mui
 // import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography } from '@mui/material';
+import { Grid, Container, Typography } from "@mui/material";
 // components
-import Page from '../components/Page';
-// import Iconify from '../components/Iconify';
-// sections
-import {
-  // AppTasks,
-  AppNewsUpdate,
-  // AppOrderTimeline,
-  // AppCurrentVisits,
-  // AppWebsiteVisits,
-  // AppTrafficBySite,
-  AppWidgetSummary,
-  // AppCurrentSubject,
-  // AppConversionRates,
-} from '../sections/@dashboard/app';
+import Page from "../components/Page";
+import AppNewsUpdate from "../sections/@dashboards/app/AppNewsUpdate";
+import AppWidgetSummary from "../sections/@dashboards/app/AppWidgetSummary";
 
 // ----------------------------------------------------------------------
 
@@ -32,19 +21,34 @@ export default function DashboardApp() {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Facebook" icon={'ant-design:facebook-filled'} />
+            <AppWidgetSummary
+              title="Facebook"
+              icon={"ant-design:facebook-filled"}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Apple" color="info" icon={'ant-design:apple-filled'} />
+            <AppWidgetSummary
+              title="Apple"
+              color="info"
+              icon={"ant-design:apple-filled"}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Youtube" color="warning" icon={'ant-design:youtube-filled'} />
+            <AppWidgetSummary
+              title="Youtube"
+              color="warning"
+              icon={"ant-design:youtube-filled"}
+            />
           </Grid>
 
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Instagram" color="error" icon={'ant-design:instagram-filled'} />
+            <AppWidgetSummary
+              title="Instagram"
+              color="error"
+              icon={"ant-design:instagram-filled"}
+            />
           </Grid>
 
           <Grid item xs={12} md={6} lg={8}>

@@ -1,11 +1,20 @@
 import "./App.css";
-import { Login, Register } from "./components/login/index";
+// routes
+import Router from './routes';
+// theme
+import ThemeProvider from './theme';
+// components
+import ScrollToTop from './components/ScrollToTop';
+import { BaseOptionChartStyle } from './components/chart/BaseOptionChart';
+// import { Login, Register } from "./components/login/index";
 
 function App() {
   return (
-    <div className="App">
-      <Register />
-    </div>
+    <ThemeProvider>
+      <ScrollToTop />
+      <BaseOptionChartStyle />
+      <Router />
+    </ThemeProvider>
   );
 }
 
