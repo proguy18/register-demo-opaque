@@ -7,9 +7,9 @@ module.exports = (io, sodium, oprf) => {
     const get = io.get.bind(null, op_id);
     const give = io.give.bind(null, op_id);
 
-    const pw = util.oprfKdf(password);
+    const hashedPassword = util.oprfKdf(password);
     give("sid", user_id);
-    give("pw", pw);
+    give("hashedPassword", hashedPassword);
 
     return await get("registered");
   };
@@ -21,23 +21,23 @@ module.exports = (io, sodium, oprf) => {
     const give = io.give.bind(null, op_id);
 
     const sid = await get("sid");
-    const pw = await get("pw");
+    const hashedPassword = await get("hashedPassword");
 
-    const ks = sodium.crypto_core_ristretto255_scalar_random();
-    const rw = util.iteratedHash(util.oprfF(ks, pw), t);
-    const ps = sodium.crypto_core_ristretto255_scalar_random();
-    const pu = sodium.crypto_core_ristretto255_scalar_random();
-    const Ps = sodium.crypto_scalarmult_ristretto255_base(ps);
-    const Pu = sodium.crypto_scalarmult_ristretto255_base(pu);
-    const c = {
-      pu: util.sodiumAeadEncrypt(rw, pu),
-      Pu: util.sodiumAeadEncrypt(rw, Pu),
-      Ps: util.sodiumAeadEncrypt(rw, Ps),
+    const serverOPRFKey = sodium.crypto_core_ristretto255_scalar_random();
+    const OPRFPassword = util.iteratedHash(util.oprfF(serverOPRFKey, hashedPassword), t);
+    const serverPrivateKey = sodium.crypto_core_ristretto255_scalar_random();
+    const clientPrivateKey = sodium.crypto_core_ristretto255_scalar_random();
+    const serverPublicKey = sodium.crypto_scalarmult_ristretto255_base(serverPrivateKey);
+    const clientPublicKey = sodium.crypto_scalarmult_ristretto255_base(clientPrivateKey);
+    const asymmetricKeys = {
+      clientPrivateKey: util.sodiumAeadEncrypt(OPRFPassword, clientPrivateKey),
+      clientPublicKey: util.sodiumAeadEncrypt(OPRFPassword, clientPublicKey),
+      serverPublicKey: util.sodiumAeadEncrypt(OPRFPassword, serverPublicKey),
     };
 
     const user_record = {
       id: sid,
-      pepper: { ks: ks, ps: ps, Ps: Ps, Pu: Pu, c: c },
+      pepper: { serverOPRFKey: serverOPRFKey, serverPrivateKey: serverPrivateKey, serverPublicKey: serverPublicKey, clientPublicKey: clientPublicKey, asymmetricKeys: asymmetricKeys },
     };
     give("registered", true);
 
@@ -53,8 +53,8 @@ module.exports = (io, sodium, oprf) => {
     const r = sodium.crypto_core_ristretto255_scalar_random();
     const xu = sodium.crypto_core_ristretto255_scalar_random();
 
-    const pw = util.oprfKdf(password);
-    const _H1_x_ = util.oprfH1(pw);
+    const hashedPassword = util.oprfKdf(password);
+    const _H1_x_ = util.oprfH1(hashedPassword);
     const H1_x = _H1_x_.point;
     const mask = _H1_x_.mask;
     const a = util.oprfRaise(H1_x, r);
@@ -71,21 +71,21 @@ module.exports = (io, sodium, oprf) => {
       throw new Error("client_authenticated_1 false");
     }
 
-    const c = await get("c");
+    const asymmetricKeys = await get("asymmetricKeys");
     const r_inv = sodium.crypto_core_ristretto255_scalar_invert(r);
-    const rw = util.iteratedHash(util.oprfH(util.oprfRaise(b, r_inv), mask), t);
-    const pu = util.sodiumAeadDecrypt(rw, c.pu);
+    const OPRFPassword = util.iteratedHash(util.oprfH(util.oprfRaise(b, r_inv), mask), t);
+    const clientPrivateKey = util.sodiumAeadDecrypt(OPRFPassword, asymmetricKeys.clientPrivateKey);
 
-    if (!sodium.crypto_core_ristretto255_is_valid_point(pu)) {
+    if (!sodium.crypto_core_ristretto255_is_valid_point(clientPrivateKey)) {
       console.log("client_authenticated_2 false " + user_id);
       give("client_authenticated", false);
       throw new Error("client_authenticated_2 false");
     }
 
-    const Pu = util.sodiumAeadDecrypt(rw, c.Pu);
-    const Ps = util.sodiumAeadDecrypt(rw, c.Ps);
+    const clientPublicKey = util.sodiumAeadDecrypt(OPRFPassword, asymmetricKeys.clientPublicKey);
+    const serverPublicKey = util.sodiumAeadDecrypt(OPRFPassword, asymmetricKeys.serverPublicKey);
     const Xs = await get("Xs");
-    const K = util.KE(pu, xu, Ps, Xs, Xu);
+    const K = util.KE(clientPrivateKey, xu, serverPublicKey, Xs, Xu);
     const SK = util.oprfF(K, util.sodiumFromByte(0));
     const As = util.oprfF(K, util.sodiumFromByte(1));
     const Au = util.oprfF(K, util.sodiumFromByte(2));
@@ -125,18 +125,18 @@ module.exports = (io, sodium, oprf) => {
       throw new Error("Authentication failed.  Alpha is not a group element.");
     }
     const xs = sodium.crypto_core_ristretto255_scalar_random();
-    const b = util.oprfRaise(a, pepper.ks);
+    const b = util.oprfRaise(a, pepper.serverOPRFKey);
     const Xs = sodium.crypto_scalarmult_ristretto255_base(xs);
 
     const Xu = await get("Xu");
-    const K = util.KE(pepper.ps, xs, pepper.Pu, Xu, Xs);
+    const K = util.KE(pepper.serverPrivateKey, xs, pepper.clientPublicKey, Xu, Xs);
     const SK = util.oprfF(K, util.sodiumFromByte(0));
     const As = util.oprfF(K, util.sodiumFromByte(1));
     const Au = util.oprfF(K, util.sodiumFromByte(2));
 
     give("beta", b);
     give("Xs", Xs);
-    give("c", pepper.c);
+    give("asymmetricKeys", pepper.asymmetricKeys);
     give("As", As);
 
     const __Au = await get("Au");
