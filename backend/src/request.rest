@@ -2,15 +2,18 @@ GET http://localhost:48080/users
 
 ###
 
-POST http://localhost:48080/users Content-Type: application/json
+POST http://localhost:48080/users 
+Content-Type: application/json
 
 {
-"name": "Kyle", "password": "password"
+"name": "Kyle", 
+"password": "password"
 }
 
 ###
 
-POST http://localhost:48080/users/login Content-Type: application/json
+POST http://localhost:48080/users/login 
+Content-Type: application/json
 
 {
 "name": "Kyle", "password": "password"
