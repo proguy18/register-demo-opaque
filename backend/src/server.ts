@@ -1,13 +1,14 @@
 import express from "express";
-import { body, param, validationResult } from "express-validator";
-import cors from "cors";
 import { Request } from "express-serve-static-core";
 import { ParsedQs } from "qs";
-// const bcrypt = require('bcrypt')
 
 /* Set up server app */
 const app = express();
-// const port: number = +(process.env.PORT || 48080);
+
+// Set up CORS
+var cors = require('cors')
+app.use(cors())
+
 const port: number = 48080;
 
 const users: { name: string; password: string }[] = [];
@@ -49,15 +50,6 @@ app.post("/users/login", (req: express.Request, res: express.Response) => {
 app.listen(port, () => {
   console.log(`API listening on port ${port}.`);
 });
-
-/* Enable CORS */
-app.use(
-  cors({
-    origin: ["http://localhost:3000", "http://localhost:48080"],
-    credentials: true,
-    optionsSuccessStatus: 200,
-  })
-);
 
 function userAuthenticate(
   req: Request<{}, any, any, ParsedQs, Record<string, any>>,

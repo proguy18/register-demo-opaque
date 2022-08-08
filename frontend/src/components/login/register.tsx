@@ -1,5 +1,6 @@
 import React from "react";
 import { testClientRegister } from "./api/clientRegister";
+import { login, register, getUsers } from "../../api";
 
 // type Props {}
 // type State {
@@ -31,7 +32,9 @@ export class Register extends React.Component {
   //   };
 
   testRun = () => {
-    testClientRegister(this.password, this.user_id);
+    // testClientRegister(this.password, this.user_id);
+    register(this.user_id, this.password);
+    getUsers();
   };
 
   render() {
